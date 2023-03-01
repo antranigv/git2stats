@@ -3,8 +3,8 @@ all:
 	cd build && voc -s \
 		../lDefs.Mod \
 		../List.Mod \
-		../StringList.Mod \
 		../strutils.Mod \
+		../StringList.Mod \
 		../git.Mod \
 		../git2plot.Mod -m
 

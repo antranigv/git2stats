@@ -126,6 +126,7 @@ BEGIN
 		commit.Sponsor := StringList.Create();
 		REPEAT
 			Files.ReadLine(log.rd, line);
+			StrUtils.RemoveLeftChars(line, ' ');
 			IF line # "" THEN
 				wordptr := StrUtils.ExtractWord(1, line, ' ');
 				IF wordptr^ = sponsorLex THEN

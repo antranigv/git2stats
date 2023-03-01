@@ -75,14 +75,12 @@ PROCEDURE RemoveLeftChars* (VAR s : ARRAY OF CHAR; ch : CHAR);
 VAR
 	l : INTEGER;
 BEGIN
-IF s # "" THEN
   l := 0;
-  REPEAT
-  IF s[l] = ch THEN Strings.Delete (s, l, 1) END;
-  INC(l)
-  UNTIL s[l] # ch;
-END;
-
+  LOOP
+    IF s = "" THEN EXIT END;
+    IF s[l] # ch THEN EXIT END;
+    IF s[l] = ch THEN Strings.Delete (s, 0, 1) END;
+  END;
 END RemoveLeftChars;
 
 PROCEDURE RemoveRightChars* (VAR s : ARRAY OF CHAR; ch : CHAR);

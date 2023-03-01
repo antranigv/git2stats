@@ -10,13 +10,6 @@ IMPORT
 TYPE
 	ArgV = ARRAY 64 OF CHAR;
 
-	Counter = RECORD
-		Count: INTEGER;
-		Name: Git.IncName;
-	END;
-
-	CounterArrPtr = POINTER TO ARRAY OF Counter;
-
 (*
 PROCEDURE FindCounter(name: IncName; VAR Counters: CounterArrPtr; VAR i: INTEGER): BOOLEAN;
 BEGIN
@@ -108,25 +101,15 @@ END main2;
 *)
 
 PROCEDURE main;
-(*
-VAR
-	c     : CounterArrPtr;
-	i     : INTEGER;
-	line  : ARRAY 4096 OF CHAR;
-	fbsd  : HUGEINT;
-	spon  : HUGEINT;
-	incn  : IncName;
-*)
-
 	VAR
-		log   : Git.Log;
-		sponsored: Git.Log;
-		argv  : ArgV;
-		c     : Git.Commit;
-		d     : Git.Commit;
-		i     : LONGINT;
-		h     : HUGEINT;
-		listptr : lDefs.pstring;
+		log       : Git.Log;
+		sponsored : POINTER TO ARRAY OF Git.Log;
+		argv      : ArgV;
+		c         : Git.Commit;
+		d         : Git.Commit;
+		i         : LONGINT;
+		h         : HUGEINT;
+		listptr   : lDefs.pstring;
 
 BEGIN
 	IF Modules.ArgCount < 2 THEN
@@ -144,12 +127,9 @@ BEGIN
 	log.Populate(log);
 
 	c := log.HEAD;
-  sponsored := Git.Create();
 	REPEAT
 		Out.String(c.Hash); Out.String(" ");
 		IF c.Sponsor.Count # 0 THEN
-			Git.CopyCommit(c, d);
-			h := sponsored.Add(sponsored, d);
 			FOR i := 0 TO c.Sponsor.Count - 1 DO
 				listptr := c.Sponsor.GetString(c.Sponsor, i);
 				Out.String(listptr^); Out.String(" ");
@@ -159,7 +139,6 @@ BEGIN
 		c := c.Next;
 	UNTIL c = NIL;
 
-Out.String("number of sponsored commits "); Out.Int(sponsored.Count, 0); Out.Ln;
 END main;
 
 BEGIN
