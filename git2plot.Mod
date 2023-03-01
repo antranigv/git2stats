@@ -1,33 +1,21 @@
 MODULE git2plot;
 IMPORT
-	Args,
 	Out,
-	Files,
+	Git,
 	Modules,
 	Strings;
 
 TYPE
-	IncName  = ARRAY 128 OF CHAR;
 	ArgV = ARRAY 64 OF CHAR;
 
 	Counter = RECORD
 		Count: INTEGER;
-		Name: IncName;
+		Name: Git.IncName;
 	END;
 
 	CounterArrPtr = POINTER TO ARRAY OF Counter;
 
-VAR
-	c     : CounterArrPtr;
-	i     : INTEGER;
-	argv  : ArgV;
-	logfd : Files.File;
-	logr  : Files.Rider;
-	line  : ARRAY 4096 OF CHAR;
-	fbsd  : HUGEINT;
-	spon  : HUGEINT;
-	incn  : IncName;
-
+(*
 PROCEDURE FindCounter(name: IncName; VAR Counters: CounterArrPtr; VAR i: INTEGER): BOOLEAN;
 BEGIN
 		i   := 0;
@@ -64,11 +52,15 @@ BEGIN
 	END;
 END PrintSponsoredStat;
 
+*)
+
 PROCEDURE Usage(VAR progname: ArgV);
 BEGIN
 	Out.String("Usage: "); Out.String(progname); Out.String(" git.log"); Out.Ln;
 END Usage;
 
+(*
+PROCEDURE main2;
 BEGIN
 	IF Modules.ArgCount < 2 THEN
 		Modules.GetArg(0, argv);
@@ -78,7 +70,6 @@ BEGIN
 
 	NEW(c, 1024);
 
-	Modules.GetArg(1, argv);
 	logfd := Files.Old(argv);
 
 	fbsd  := 0;
@@ -111,4 +102,40 @@ BEGIN
 	Out.String("FreeBSD: "); Out.Int(fbsd, 0); Out.Ln;
 	Out.String("Sponsored: "); Out.Int(spon, 0); Out.Ln;
 	PrintSponsoredStat(c);
+END main2;
+*)
+
+PROCEDURE main;
+(*
+VAR
+	c     : CounterArrPtr;
+	i     : INTEGER;
+	line  : ARRAY 4096 OF CHAR;
+	fbsd  : HUGEINT;
+	spon  : HUGEINT;
+	incn  : IncName;
+*)
+
+	VAR
+		log : Git.Log;
+		argv  : ArgV;
+
+BEGIN
+	IF Modules.ArgCount < 2 THEN
+		Modules.GetArg(0, argv);
+		Usage(argv);
+		HALT(1);
+	END;
+
+	Modules.GetArg(1, argv);
+	log := Git.CreateLog(argv);
+	IF log = NIL THEN
+		Out.String("File not found: "); Out.String(argv); Out.Ln;
+		HALT(2)
+	END;
+	log.Populate(log);
+END main;
+
+BEGIN
+	main;
 END git2plot.
