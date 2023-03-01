@@ -117,8 +117,10 @@ VAR
 *)
 
 	VAR
-		log : Git.Log;
+		log   : Git.Log;
 		argv  : ArgV;
+		c     : Git.Commit;
+		i     : LONGINT;
 
 BEGIN
 	IF Modules.ArgCount < 2 THEN
@@ -134,6 +136,19 @@ BEGIN
 		HALT(2)
 	END;
 	log.Populate(log);
+
+	c := log.HEAD;
+
+	REPEAT
+		Out.String(c.Hash); Out.String(" ");
+		IF c.Sponsor # NIL THEN
+			FOR i := 0 TO LEN(c.Sponsor^) - 1 DO
+				Out.String(c.Sponsor^[i]); Out.String(" ");
+			END;
+		END;
+		Out.Ln;
+		c := c.Next;
+	UNTIL c = NIL
 END main;
 
 BEGIN

@@ -11,7 +11,7 @@ CONST
 	sponsoredLes = "Sponsored";
 
 TYPE
-	IncName*  = POINTER TO ARRAY OF CHAR;
+	IncName*  =  ARRAY 64 OF CHAR;
 
 	TDate = RECORD
 	Year, Month, Day : INTEGER;
@@ -19,15 +19,15 @@ TYPE
 
 	Commit*  = POINTER TO CommitDesc;
 	CommitDesc*  = RECORD
-		Hash : ARRAY 48 OF CHAR;
-		Date : TDate;
+		Hash- : ARRAY 48 OF CHAR;
+		Date- : TDate;
 
-		Sponsor  : POINTER TO ARRAY OF IncName;
-		Obtained : POINTER TO ARRAY OF IncName;
+		Sponsor-  : POINTER TO ARRAY OF IncName;
+		Obtained- : POINTER TO ARRAY OF IncName;
 
-		Author   : ARRAY 64 OF CHAR;
-		Next : Commit;
-		Prev : Commit;
+		Author-   : ARRAY 64 OF CHAR;
+		Next- : Commit;
+		Prev- : Commit;
 	END;
 
 	Log* = POINTER TO LogDesc;
@@ -46,6 +46,17 @@ TYPE
 
 PROCEDURE AddCommit(VAR log: Log; commit: Commit): HUGEINT;
 BEGIN
+	IF log.HEAD = NIL THEN
+		log.HEAD := commit;
+		log.TAIL := commit;
+	ELSE
+		log.TAIL.Next := commit;
+		commit.Prev   := log.TAIL;
+		log.TAIL      := commit;
+	END;
+	INC(log.Count);
+	log.TAIL.Next := NIL;
+	RETURN log.Count
 END AddCommit;
 
 PROCEDURE GetCommit(VAR log: Log; id: HUGEINT): Commit;
@@ -70,8 +81,8 @@ PROCEDURE PopulateLog(VAR log: Log);
 		line    : StrUtils.string;
 		wordptr : StrUtils.pstring;
 		commit  : Commit;
+		h       : HUGEINT;
 BEGIN
-		NEW(commit);
 (*
 	WHILE ~ log.rd.eof DO
 *)
@@ -79,7 +90,20 @@ BEGIN
 		wordptr := StrUtils.ExtractWord(1, line, ' ');
 		Expect(wordptr^, commitLex);
 		wordptr := StrUtils.ExtractWord(2, line, ' ');
+
+		NEW(commit);
 		COPY(wordptr^, commit.Hash);
+		h := log.Add(log, commit);
+		NEW(commit);
+		COPY("HUMMUS KIMCHI", commit.Hash);
+		NEW(commit.Sponsor, 2);
+		COPY("antranigv", commit.Sponsor^[0]);
+		COPY("norayr"   , commit.Sponsor^[1]);
+		h := log.Add(log, commit);
+		NEW(commit);
+		COPY("FOOBARBAZ", commit.Hash);
+		h := log.Add(log, commit);
+
 (*
 	END;
 *)
