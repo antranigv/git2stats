@@ -3,6 +3,8 @@ IMPORT
 	Out,
 	Git,
 	Modules,
+	lDefs,
+	StringList,
 	Strings;
 
 TYPE
@@ -121,6 +123,7 @@ VAR
 		argv  : ArgV;
 		c     : Git.Commit;
 		i     : LONGINT;
+		listptr : lDefs.pstring;
 
 BEGIN
 	IF Modules.ArgCount < 2 THEN
@@ -141,9 +144,10 @@ BEGIN
 
 	REPEAT
 		Out.String(c.Hash); Out.String(" ");
-		IF c.Sponsor # NIL THEN
-			FOR i := 0 TO LEN(c.Sponsor^) - 1 DO
-				Out.String(c.Sponsor^[i]); Out.String(" ");
+		IF c.Sponsor.Count # 0 THEN
+			FOR i := 0 TO c.Sponsor.Count - 1 DO
+				listptr := c.Sponsor.GetString(c.Sponsor, i);
+				Out.String(listptr^); Out.String(" ");
 			END;
 		END;
 		Out.Ln;

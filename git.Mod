@@ -3,18 +3,21 @@ MODULE Git;
 IMPORT
 	Out,
 	Files,
+	StringList,
 	StrUtils := strutils,
-	Strings;
+	Strings  := ethStrings;
 
 CONST
-	commitLex = "commit";
-	sponsoredLes = "Sponsored";
+	commitLex  = "Commit:";
+	authorLex  = "Author:";
+	dateLex    = "Date:";
+	sponsorLex = "Sponsored";
 
 TYPE
 	IncName*  =  ARRAY 64 OF CHAR;
 
 	TDate = RECORD
-	Year, Month, Day : INTEGER;
+	Year, Month, Day : LONGINT;
 	END;
 
 	Commit*  = POINTER TO CommitDesc;
@@ -22,8 +25,8 @@ TYPE
 		Hash- : ARRAY 48 OF CHAR;
 		Date- : TDate;
 
-		Sponsor-  : POINTER TO ARRAY OF IncName;
-		Obtained- : POINTER TO ARRAY OF IncName;
+		Sponsor-  : StringList.TStringList;
+		Obtained- : StringList.TStringList;
 
 		Author-   : ARRAY 64 OF CHAR;
 		Next- : Commit;
@@ -80,33 +83,61 @@ PROCEDURE PopulateLog(VAR log: Log);
 	VAR
 		line    : StrUtils.string;
 		wordptr : StrUtils.pstring;
+		dateptr : StrUtils.pstring;
+		date    : ARRAY 4 OF CHAR;
 		commit  : Commit;
 		h       : HUGEINT;
 BEGIN
-(*
+	Files.ReadLine(log.rd, line);
 	WHILE ~ log.rd.eof DO
-*)
-		Files.ReadLine(log.rd, line);
+		NEW(commit);
+
+		(* Commit *)
 		wordptr := StrUtils.ExtractWord(1, line, ' ');
 		Expect(wordptr^, commitLex);
 		wordptr := StrUtils.ExtractWord(2, line, ' ');
-
-		NEW(commit);
 		COPY(wordptr^, commit.Hash);
-		h := log.Add(log, commit);
-		NEW(commit);
-		COPY("HUMMUS KIMCHI", commit.Hash);
-		NEW(commit.Sponsor, 2);
-		COPY("antranigv", commit.Sponsor^[0]);
-		COPY("norayr"   , commit.Sponsor^[1]);
-		h := log.Add(log, commit);
-		NEW(commit);
-		COPY("FOOBARBAZ", commit.Hash);
-		h := log.Add(log, commit);
 
-(*
+		(* Author *)
+		Files.ReadLine(log.rd, line);
+		wordptr := StrUtils.ExtractWord(1, line, ' ');
+		Expect(wordptr^, authorLex);
+		wordptr := StrUtils.ExtractWord(2, line, ' ');
+		COPY(wordptr^, commit.Author);
+
+		(* Date *)
+		Files.ReadLine(log.rd, line);
+		wordptr := StrUtils.ExtractWord(1, line, ' ');
+		Expect(wordptr^, dateLex);
+		wordptr := StrUtils.ExtractWord(2, line, ' ');
+
+		dateptr := StrUtils.ExtractWord(1, wordptr^, '-');
+		COPY(dateptr^, date);
+		Strings.StrToInt(date, commit.Date.Year);
+
+		dateptr := StrUtils.ExtractWord(2, wordptr^, '-');
+		COPY(dateptr^, date);
+		Strings.StrToInt(date, commit.Date.Month);
+
+		dateptr := StrUtils.ExtractWord(3, wordptr^, '-');
+		COPY(dateptr^, date);
+		Strings.StrToInt(date, commit.Date.Day);
+
+		commit.Sponsor := StringList.Create();
+		REPEAT
+			Files.ReadLine(log.rd, line);
+			IF line # "" THEN
+				wordptr := StrUtils.ExtractWord(1, line, ' ');
+				IF wordptr^ = sponsorLex THEN
+					wordptr := StrUtils.ExtractWord(2, line, ':');
+					commit.Sponsor.AppendString(commit.Sponsor, wordptr^);
+				END;
+			END;
+		UNTIL line = "===EOC===";
+
+		h := log.Add(log, commit);
+		Files.ReadLine(log.rd, line);
 	END;
-*)
 END PopulateLog;
 
 PROCEDURE CreateLog*(VAR fpath: ARRAY OF CHAR): Log;

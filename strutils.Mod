@@ -72,11 +72,16 @@ BEGIN
 END Pos;
 
 PROCEDURE RemoveLeftChars* (VAR s : ARRAY OF CHAR; ch : CHAR);
+VAR
+	l : INTEGER;
 BEGIN
-REPEAT
-IF s[0] = ch THEN Strings.Delete (s, 0, 1) END;
-
-UNTIL s[0] # ch;
+IF s # "" THEN
+  l := 0;
+  REPEAT
+  IF s[l] = ch THEN Strings.Delete (s, l, 1) END;
+  INC(l)
+  UNTIL s[l] # ch;
+END;
 
 END RemoveLeftChars;
 
