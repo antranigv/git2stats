@@ -120,9 +120,12 @@ VAR
 
 	VAR
 		log   : Git.Log;
+		sponsored: Git.Log;
 		argv  : ArgV;
 		c     : Git.Commit;
+		d     : Git.Commit;
 		i     : LONGINT;
+		h     : HUGEINT;
 		listptr : lDefs.pstring;
 
 BEGIN
@@ -141,10 +144,12 @@ BEGIN
 	log.Populate(log);
 
 	c := log.HEAD;
-
+  sponsored := Git.Create();
 	REPEAT
 		Out.String(c.Hash); Out.String(" ");
 		IF c.Sponsor.Count # 0 THEN
+			Git.CopyCommit(c, d);
+			h := sponsored.Add(sponsored, d);
 			FOR i := 0 TO c.Sponsor.Count - 1 DO
 				listptr := c.Sponsor.GetString(c.Sponsor, i);
 				Out.String(listptr^); Out.String(" ");
@@ -152,7 +157,9 @@ BEGIN
 		END;
 		Out.Ln;
 		c := c.Next;
-	UNTIL c = NIL
+	UNTIL c = NIL;
+
+Out.String("number of sponsored commits "); Out.Int(sponsored.Count, 0); Out.Ln;
 END main;
 
 BEGIN

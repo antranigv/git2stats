@@ -162,9 +162,36 @@ BEGIN
 		log := NIL;
 	END;
 
-
-
 	RETURN log;
 END CreateLog;
+
+PROCEDURE Create*(): Log;
+	VAR
+		log : Log;
+
+BEGIN
+	NEW(log);
+	log.Add      := AddCommit;
+	log.Get      := GetCommit;
+	log.Populate := PopulateLog;
+
+	log.HEAD := NIL;
+	log.TAIL := NIL;
+	log.Count := 0;
+
+	RETURN log;
+END Create;
+
+PROCEDURE CopyCommit*(VAR src, dst: Commit);
+BEGIN
+  NEW(dst);
+	dst^.Hash := src^.Hash;
+	dst^.Date := src^.Date;
+	dst^.Sponsor := src^.Sponsor;
+	dst^.Obtained := src^.Obtained;
+	dst^.Author := src^.Author;
+	dst^.Next := NIL;
+	dst^.Prev := NIL;
+END CopyCommit;
 
 END Git.
