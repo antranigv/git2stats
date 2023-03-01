@@ -1,3 +1,3 @@
 all:
 	mkdir -p build
-	cd build && voc -s ../git2plot.Mod
+	cd build && voc -s ../git2plot.Mod -m
