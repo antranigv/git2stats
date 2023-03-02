@@ -10,7 +10,7 @@ TYPE
     NodeDesc* = RECORD
          obj* : TObject;
         next* : Node;
-	  END;
+    END;
 
        TList* = POINTER TO TListDesc;
 
@@ -45,7 +45,7 @@ First*, Last* : Node;
     END;
     l.Last := e;
     l.Last.next := NIL;
-    INC(l.Count);           
+    INC(l.Count);
     l.res := TRUE;
     RETURN (l.Count - 1);
  END Add;
@@ -73,14 +73,14 @@ First*, Last* : Node;
  BEGIN
    l.res := FALSE;
    IF s # NIL THEN
-	   i := 0;
-	   REPEAT
+     i := 0;
+     REPEAT
        e := s.Get(s, i);
-		   IF e # NIL THEN
+       IF e # NIL THEN
          l.Append(l, e.obj);
-		   END;
-	     INC(i);
-	   UNTIL (i = s.Count) OR (e = NIL);
+       END;
+       INC(i);
+     UNTIL (i = s.Count) OR (e = NIL);
    END
  END AppendList;
 
@@ -91,7 +91,7 @@ First*, Last* : Node;
    e, u, p : Node;
          j : LONGINT;
  BEGIN
-    l.res := FALSE; 
+    l.res := FALSE;
     NEW(e);
     e.obj := s;
     NEW(u); NEW(p);
@@ -121,9 +121,9 @@ First*, Last* : Node;
  END Clear;
 
  PROCEDURE Free*(l : TList);
- 
+
  BEGIN
- 
+
  END Free;
 
  PROCEDURE Get*(l : TList; k : LONGINT) : Node;
@@ -138,7 +138,7 @@ First*, Last* : Node;
        e := l.First;
        WHILE i # k DO
           IF e # NIL THEN e := e.next END;
-	  INC(i);
+    INC(i);
        END;
        l.res := TRUE
     END;
@@ -154,17 +154,17 @@ First*, Last* : Node;
        NEW(p); NEW(e);
        e := l.First;
        p := l.First;
-       IF k = 0 THEN 
-          l.First := l.First.next 
+       IF k = 0 THEN
+          l.First := l.First.next
        ELSE
           i := 0;
           WHILE i # k DO
              p := e;
-	     e := e.next;
-	     INC(i);
+       e := e.next;
+       INC(i);
           END;
           IF e.next # NIL THEN p.next := e.next ELSE p.next := NIL END;
-       END;	  
+       END;
        DEC(l.Count);
        l.res := TRUE;
     END;
@@ -172,7 +172,7 @@ First*, Last* : Node;
 
 PROCEDURE Empty* (l : TList) : BOOLEAN;
  BEGIN
-    RETURN l.First = NIL  
+    RETURN l.First = NIL
  END Empty;
 
  PROCEDURE Create* () : TList;
@@ -194,13 +194,4 @@ PROCEDURE Empty* (l : TList) : BOOLEAN;
     l.res     := TRUE;
     RETURN(l);
  END Create;
-
-(* PROCEDURE Delete* (VAR l : StringList; VAR e : Str);
- BEGIN
-    e := l.First;
-    l.First := l.First.next;
-    IF l.First = NIL THEN l.Last := NIL END;
- END Delete;
-*)
- 
 END List.

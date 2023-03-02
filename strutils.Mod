@@ -73,7 +73,7 @@ END Pos;
 
 PROCEDURE RemoveLeftChars* (VAR s : ARRAY OF CHAR; ch : CHAR);
 VAR
-	l : INTEGER;
+  l : INTEGER;
 BEGIN
   l := 0;
   LOOP
@@ -493,5 +493,4 @@ BEGIN
     Out.Int(i, 0); Out.Char(" "); Out.Char(s[i]); Out.Ln; INC(i)
   END
 END dumpChars;
-
 END strutils.
