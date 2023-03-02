@@ -5,26 +5,11 @@ IMPORT
   Modules,
   lDefs,
   StringList,
-  Strings;
+  Strings,
+  PlatformUnix;
 
 TYPE
   ArgV = ARRAY 64 OF CHAR;
-
-PROCEDURE PrintSponsoredStat(VAR Counters: CounterArrPtr);
-  VAR
-    i : INTEGER;
-BEGIN
-  i := 0;
-  WHILE i # LEN(Counters^) DO
-    IF Counters^[i].Name # "" THEN
-      Out.String(Counters^[i].Name); Out.String(":");
-      Out.Int(Counters^[i].Count, 0); Out.Ln;
-    END;
-    INC(i)
-  END;
-END PrintSponsoredStat;
-
-*)
 
 PROCEDURE Usage(VAR progname: ArgV);
 BEGIN
@@ -50,11 +35,13 @@ BEGIN
   END;
 
   Modules.GetArg(1, argv);
-  log := Git.CreateLog(argv);
+  log := Git.CreateLogFromFile(argv);
   IF log = NIL THEN
-    Out.String("File not found: "); Out.String(argv); Out.Ln;
+    PlatformUnix.WriteStderr("File not found: "); PlatformUnix.WriteStderr(argv);
+    PlatformUnix.WriteStderrLn;
     HALT(2)
   END;
+
   log.Populate(log);
 
   c := log.HEAD;
@@ -69,7 +56,6 @@ BEGIN
     Out.Ln;
     c := c.Next;
   UNTIL c = NIL;
-
 END main;
 
 BEGIN

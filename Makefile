@@ -1,6 +1,7 @@
 all:
 	mkdir -p build
 	cd build && voc -s \
+		../UnixPlatform.Mod \
 		../lDefs.Mod \
 		../List.Mod \
 		../strutils.Mod \

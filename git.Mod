@@ -142,7 +142,7 @@ BEGIN
   END;
 END PopulateLog;
 
-PROCEDURE CreateLog*(VAR fpath: ARRAY OF CHAR): Log;
+PROCEDURE CreateLog*(): Log;
   VAR
     log : Log;
 
@@ -155,6 +155,16 @@ BEGIN
   log.HEAD := NIL;
   log.TAIL := NIL;
   log.Count := 0;
+
+  RETURN log;
+END CreateLog;
+
+PROCEDURE CreateLogFromFile*(VAR fpath: ARRAY OF CHAR): Log;
+  VAR
+    log : Log;
+
+BEGIN
+  log := CreateLog();
 
   log.fd := Files.Old(fpath);
 
@@ -165,24 +175,7 @@ BEGIN
   END;
 
   RETURN log;
-END CreateLog;
-
-PROCEDURE Create*(): Log;
-  VAR
-    log : Log;
-
-BEGIN
-  NEW(log);
-  log.Add      := AddCommit;
-  log.Get      := GetCommit;
-  log.Populate := PopulateLog;
-
-  log.HEAD := NIL;
-  log.TAIL := NIL;
-  log.Count := 0;
-
-  RETURN log;
-END Create;
+END CreateLogFromFile;
 
 PROCEDURE CopyCommit*(VAR src, dst: Commit);
 BEGIN
